@@ -4,7 +4,8 @@ import pystac
 import pandas as pd
 import time
 
-catPath = "/nbhome/a3r/code/spear-flp/catalog_blue.csv"
+baseUrl = "https://noaa-gfdl-spear-large-ensembles-pds.s3.amazonaws.com/index.html#SPEAR/"
+catPath = "/home/Aria.Radick/Documents/catalogs/cmip_spear-med_hist/catalog.csv"
 
 properties = [
     "activity_id", 
@@ -16,6 +17,7 @@ properties = [
     "table_id",
     "grid_label", 
     "variable_id",
+    "version_id",
     "chunk_freq",
     "platform",
     "dimensions",
@@ -24,8 +26,9 @@ properties = [
 ]
 
 def make_add_asset(row, item):
+    hyperlink = baseUrl + '/'.join(row['path'].split('/'))
     a = pystac.Asset(
-        href=row['path'],
+        href=hyperlink,
         title="{}.{}".format(
             row["member_id"],
             row["time_range"]
@@ -43,8 +46,8 @@ def stac_from_csv(catalog_path):
 
     item_list = []
     
-    for grp,df in catalog_df.groupby(["experiment_id","variable_id"]):
-        title = grp[0] + '.' + grp[1]
+    for grp,df in catalog_df.groupby(["experiment_id","table_id","variable_id"]):
+        title = '.'.join(grp)
 
         # all metadata from reading netCDF file should be same across group
         nc_metadata = metadata_reader.get(
@@ -78,8 +81,8 @@ def stac_from_csv(catalog_path):
 
         item_list.append(item)
 
-    c = pystac.Collection.from_items(item_list, id="SPEAR-FLP")
-    c.title = "SPEAR Forward-Looking Projections"
+    c = pystac.Collection.from_items(item_list, id="SPEAR-MED")
+    c.title = "SPEAR MED CMIP6"
     c.summaries = pystac.Summaries(
         {
             kk : list(set([
@@ -88,15 +91,15 @@ def stac_from_csv(catalog_path):
             for kk in item_list[0].properties.keys()
         }
     )
-    c.add_asset(
-        key="Collection Thumbnail",
-        asset=pystac.Asset(
-            href="/nbhome/a3r/test.png",
-            title="Collection Thumbnail",
-            media_type="image/png",
-            roles=["thumbnail"]
-        )
-    )
+    # c.add_asset(
+    #     key="Collection Thumbnail",
+    #     asset=pystac.Asset(
+    #         href="/nbhome/a3r/test.png",
+    #         title="Collection Thumbnail",
+    #         media_type="image/png",
+    #         roles=["thumbnail"]
+    #     )
+    # )
 
     catalog.add_child(c)
 
