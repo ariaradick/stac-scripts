@@ -1,0 +1,29 @@
+inputCatalog: null
+outputPath: null
+catalogName: "catalog"
+collection:
+  id: null
+  description: null
+  title: null
+item:
+  groupBy: ["experiment_id","table_id","variable_id"]
+  getBounds: true
+  getVariableLongName: true
+  getUnits: true
+asset:
+  titleFormat: ["member_id","time_range"]
+  hrefPrepend: "https://noaa-gfdl-spear-large-ensembles-pds.s3.amazonaws.com/SPEAR/"
+  pathSkipDepth: 2 # how many folders to skip when populating href
+extensions:
+  cmip6: # LHS will be prepended by cmip6 when appropriate
+    extensionUrl: "https://stac-extensions.github.io/cmip6/v3.0.0/schema.json"
+    overrides: # values that will be set for all items
+      product : "model-output"
+      institution_id : "NOAA-GFDL"
+      source_id : "SPEAR-MED"
+    mappings: # RHS is intake-esm column name
+      version : "version_id"
+      variant_label: "member_id"
+  file: # LHS will be prepended by file when appropriate
+    extensionUrl: "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+    pathSkipDepth: 2 # how many folders to skip when populating file:local_path
