@@ -1,10 +1,11 @@
 import os,sys
 from stac_utils import MetadataSlowLoader, convert_timerange
 import pystac
+import numpy as np
 import pandas as pd
 import time
 
-baseUrl = "https://noaa-gfdl-spear-large-ensembles-pds.s3.amazonaws.com/index.html#SPEAR/"
+baseUrl = "https://noaa-gfdl-spear-large-ensembles-pds.s3.amazonaws.com/SPEAR/"
 catPath = "/home/Aria.Radick/Documents/catalogs/cmip_spear-med_hist/catalog.csv"
 
 properties = [
@@ -25,8 +26,12 @@ properties = [
     "standard_name"
 ]
 
+@np.vectorize
+def _sfn(a):
+    return int(a.split('i')[0][1:])
+
 def make_add_asset(row, item):
-    hyperlink = baseUrl + '/'.join(row['path'].split('/'))
+    hyperlink = baseUrl + '/'.join(row['path'].split('/')[3:])
     a = pystac.Asset(
         href=hyperlink,
         title="{}.{}".format(
@@ -77,7 +82,12 @@ def stac_from_csv(catalog_path):
             datetime = None
         )
 
-        df.apply(make_add_asset,axis=1,args=(item,))
+        df.sort_values('member_id', key=_sfn, inplace=True)
+        
+        for i,r in df.iterrows():
+            make_add_asset(r,item)
+
+        # df.apply(make_add_asset,axis=1,args=(item,))
 
         item_list.append(item)
 
