@@ -54,6 +54,8 @@ class STAC_Search:
         paths = []
         for asset_id, asset in item.assets:
             truths = [asset.extra_fields[k] == v for k,v in self.asset_params.items()]
+            truths.append( asset.extra_fields['start_datetime'] <= 
+                           self.datetime <= asset.extra_fields['end_datetime'] )
             if all(truths):
                 paths.append(asset.get_absolute_href())
         return paths
