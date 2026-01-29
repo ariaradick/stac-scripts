@@ -14,7 +14,7 @@ catalog = "/home/Aria.Radick/Documents/catalogs/cmip_spear-med_hist/catalog.csv"
 
 output_path_template = ['institution_id','source_id','experiment_id',"table_id","variable_id","grid_label","version_id"]
 output_file_template = ["variable_id","table_id",'source_id',"experiment_id","grid_label"]
-base_path = '/work/a3r/Documents/code/stac_scripts/catalog_thumbs/cmip_items/'
+base_path = '/work/a3r/Documents/code/stac-scripts/catalog_thumbs/cmip_items/'
 
 class BasicQAPlots:
     def __init__(self, catalog_file, base_output_path, output_path_template, 

@@ -12,7 +12,7 @@ catalog = "/home/Aria.Radick/Documents/catalogs/cmip_spear-med_hist/catalog.csv"
 
 output_path_template = ['institution_id','source_id','experiment_id','member_id',"table_id","variable_id","grid_label","version_id"]
 output_file_template = ["variable_id","table_id",'source_id',"experiment_id",'member_id',"grid_label"]
-base_path = '/work/a3r/Documents/code/stac_scripts/catalog_thumbs/'
+base_path = '/work/a3r/Documents/code/stac-scripts/catalog_thumbs/'
 
 def get_thumb_path(row, output_path=output_path_template, 
                        output_file=output_file_template,
@@ -55,7 +55,8 @@ def generate_plot(ds_avg, time_str, ens_id, exp_id):
     fig = plt.figure(figsize = (10, 5))
     axis = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
     axis.coastlines()
-    ds_avg.plot(ax = axis)
+    p = ds_avg.plot(ax = axis, add_colorbar=False, center=273.15)
+    plt.colorbar(mappable=p, label=f"{ds_avg.name} [{ds_avg.attrs['units']}]")
     plt.title(f"{ds_avg.attrs['long_name']} {time_str}")
     plt.text(0, -0.1, 'GFDL-SPEAR-MED', ha='left', va='bottom', transform=axis.transAxes)
     plt.text(0.5, -0.1, exp_id, ha='center', va='bottom', transform=axis.transAxes)
