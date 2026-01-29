@@ -15,4 +15,4 @@
 
 module load miniforge
 conda activate python_venv
-python /home/a3r/Documents/code/stac-scripts/scripts/generate_ens_thumbnails.py $1
+python /work/a3r/Documents/code/stac-scripts/scripts/generate_ens_thumbnails.py $1

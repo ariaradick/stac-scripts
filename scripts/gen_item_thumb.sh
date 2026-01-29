@@ -15,4 +15,4 @@
 
 module load miniforge
 conda activate python_venv
-python /home/a3r/Documents/code/stac-scripts/scripts/gen_item_thumb.py
+python /work/a3r/Documents/code/stac-scripts/scripts/gen_item_thumb.py
