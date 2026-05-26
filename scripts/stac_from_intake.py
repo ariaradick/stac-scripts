@@ -6,7 +6,11 @@ import pandas as pd
 import time
 
 baseUrl = "https://noaa-gfdl-spear-large-ensembles-pds.s3.amazonaws.com/SPEAR/"
-catPath = "/home/Aria.Radick/Documents/catalogs/cmip_spear-med_hist/catalog.csv"
+catPath = "/work/a3r/catalogs/cmip_spear-med_hist/catalog.csv"
+
+ensThumbBase = "https://raw.githubusercontent.com/ariaradick/SPEAR-s3-thumbnails/refs/heads/main/ensemble_thumbnails/"
+ensThumb_path_template = ['institution_id','source_id','experiment_id','member_id',"table_id","variable_id","grid_label","version_id"]
+ensThumb_file_template = ["variable_id","table_id",'source_id',"experiment_id",'member_id',"grid_label"]
 
 properties = [
     "activity_id", 
@@ -26,6 +30,17 @@ properties = [
     "standard_name"
 ]
 
+def get_thumb_path(row, output_path=ensThumb_path_template, 
+                       output_file=ensThumb_file_template,
+                       base_path=ensThumbBase,
+                       create=False):
+    path = base_path + '/'.join(row[output_path]) + '/' 
+    if create:
+        Path(path).mkdir(parents=True, exist_ok=True)
+    fname = '_'.join(row[output_file]) + '.png'
+
+    return path+fname
+
 @np.vectorize
 def _sfn(a):
     return int(a.split('i')[0][1:])
@@ -34,12 +49,13 @@ def make_add_asset(row, item):
     hyperlink = baseUrl + '/'.join(row['path'].split('/')[3:])
     a = pystac.Asset(
         href=hyperlink,
-        title="{}.{}".format(
+        title="{}_{}".format(
             row["member_id"],
             row["time_range"]
         ),
         media_type="application/netcdf",
-        roles=["data"]
+        roles=["data"],
+        extra_fields={'thumbnail' : get_thumb_path(row)}
     )
     item.add_asset(key=a.title, asset=a)
 
@@ -52,7 +68,7 @@ def stac_from_csv(catalog_path):
     item_list = []
     
     for grp,df in catalog_df.groupby(["experiment_id","table_id","variable_id"]):
-        title = '.'.join(grp)
+        title = '_'.join(grp)
 
         # all metadata from reading netCDF file should be same across group
         nc_metadata = metadata_reader.get(

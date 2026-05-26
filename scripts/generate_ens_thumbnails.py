@@ -8,11 +8,14 @@ from pathlib import Path
 
 tstr = "%Y-%m-%d"
 
-catalog = "/home/Aria.Radick/Documents/catalogs/cmip_spear-med_hist/catalog.csv"
+# catalog = "/home/Aria.Radick/Documents/catalogs/cmip_spear-med_hist/catalog.csv"
+catalog = "https://raw.githubusercontent.com/NOAA-GFDL/spear-flp/refs/heads/main/catalog_blue.csv"
 
-output_path_template = ['institution_id','source_id','experiment_id','member_id',"table_id","variable_id","grid_label","version_id"]
-output_file_template = ["variable_id","table_id",'source_id',"experiment_id",'member_id',"grid_label"]
-base_path = '/work/a3r/Documents/code/stac-scripts/catalog_thumbs/'
+# output_path_template = ['institution_id','source_id','experiment_id','member_id',"table_id","variable_id","grid_label","version_id"]
+output_path_template = ['experiment_id', 'member_id', 'realm']
+# output_file_template = ["variable_id","table_id",'source_id',"experiment_id",'member_id',"grid_label"]
+output_file_template = ['variable_id']
+base_path = '/work/a3r/Documents/code/stac-scripts/catalog_thumbs/tftest_ens/'
 
 def get_thumb_path(row, output_path=output_path_template, 
                        output_file=output_file_template,
@@ -55,9 +58,10 @@ def generate_plot(ds_avg, time_str, ens_id, exp_id):
     fig = plt.figure(figsize = (10, 5))
     axis = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
     axis.coastlines()
-    p = ds_avg.plot(ax = axis, add_colorbar=False, center=273.15)
-    plt.colorbar(mappable=p, label=f"{ds_avg.name} [{ds_avg.attrs['units']}]")
-    plt.title(f"{ds_avg.attrs['long_name']} {time_str}")
+    p = ds_avg.plot(ax = axis)#, add_colorbar=False)
+    # plt.colorbar(mappable=p, label=f"{ds_avg.name} [{ds_avg.attrs['units']}]")
+    plt.title(f"Average {ds_avg.name} {time_str}")
+    # plt.title(f"{ds_avg.attrs['long_name']} {time_str}")
     plt.text(0, -0.1, 'GFDL-SPEAR-MED', ha='left', va='bottom', transform=axis.transAxes)
     plt.text(0.5, -0.1, exp_id, ha='center', va='bottom', transform=axis.transAxes)
     plt.text(1, -0.1, ens_id, ha='right', va='bottom', transform=axis.transAxes)
@@ -80,5 +84,6 @@ if __name__=='__main__':
     n = sys.argv[1]
     dfcat = pd.read_csv(catalog)
     dfcat = dfcat.dropna(axis=1, how='all')
-    dfsubcat = dfcat[dfcat['member_id'] == f'r{n}i1p1f1']
-    main(dfsubcat)
+    dfsubcat = dfcat[dfcat['member_id'] == f'pp_ens_{n.zfill(2)}']
+    print(dfsubcat)
+    # main(dfsubcat)
